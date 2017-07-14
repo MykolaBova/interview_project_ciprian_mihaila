@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import com.interview.server.database.DatabaseAccess;
 import com.interview.server.places.GooglePlacesService;
 import com.interview.shared.Place;
 
@@ -19,7 +20,9 @@ public class PlacesResource {
 	public List<Place> getPlaces(@PathParam("city") String city) {
 		System.out.println("here" + city);
 		GooglePlacesService service = new GooglePlacesService();
-		return service.getPlaces(city);
+		List<Place> places = service.getPlaces(city);
+		DatabaseAccess.getInstance().savePlaces(places);
+		return places;
 	}
 	
 }
