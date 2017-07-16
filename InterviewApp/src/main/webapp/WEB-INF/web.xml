@@ -18,7 +18,7 @@
     <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
     <init-param>
      <param-name>jersey.config.server.provider.packages</param-name>
-     <param-value>com.interview</param-value>
+     <param-value>com.interview.server</param-value>
     </init-param>
   </servlet>
     
