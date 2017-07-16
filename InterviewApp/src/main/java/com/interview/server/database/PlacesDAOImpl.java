@@ -72,7 +72,9 @@ public class PlacesDAOImpl extends GenericCRUDManagerImpl<Place, String> impleme
 	public void deletePlace(String placeId) {
 		entityManager.getTransaction().begin();
 		Place place = read(placeId);
-		delete(place);
+		if (place != null) {
+			delete(place);
+		}
 		entityManager.getTransaction().commit();
 	}
 

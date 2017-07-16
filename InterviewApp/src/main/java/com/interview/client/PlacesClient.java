@@ -33,6 +33,7 @@ public interface PlacesClient extends RestService {
 	public void savePlaceDetails(PlaceDetails placeDetails, MethodCallback<PlaceDetails> callback);
 
 	@DELETE
-	@Path("/delete/{placeId}")
-	public void deletePlace(@PathParam("placeId") String placeId, MethodCallback<String> callback);
+	@Path("/delete/{cityName}/{placeId}")
+	public void deletePlace(@PathParam("cityName") String cityName, @PathParam("placeId") String placeId,
+			MethodCallback<List<Place>> callback);
 }

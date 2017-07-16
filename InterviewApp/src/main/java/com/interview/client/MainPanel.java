@@ -24,6 +24,12 @@ import com.interview.shared.Place;
 import com.interview.shared.PlaceDetails;
 
 public class MainPanel extends FlowPanel {
+
+	private TextBox searchField;
+	private CellTable<Place> placesTable;
+
+	private PlacesClient placesClient = GWT.create(PlacesClient.class);
+
 	public MainPanel() {
 		initComponents();
 	}
@@ -57,21 +63,23 @@ public class MainPanel extends FlowPanel {
 
 			@Override
 			public void update(int index, Place object, String value) {
-				PlacesClient placesClient = GWT.create(PlacesClient.class);
-				placesClient.deletePlace(object.getPlaceId(), new MethodCallback<String>() {
+				placesClient.deletePlace(object.getPlaceId(), searchField.getValue(),
+						new MethodCallback<List<Place>>() {
 
-					@Override
-					public void onSuccess(Method method, String response) {
-						Logger logger = Logger.getLogger(MainPanel.class.getName());
-						logger.log(Level.SEVERE, "success delete");
-					}
+							@Override
+							public void onSuccess(Method method, List<Place> response) {
+								Logger logger = Logger.getLogger(MainPanel.class.getName());
+								logger.log(Level.SEVERE, "success ");
+								placesTable.setRowCount(response.size(), true);
+								placesTable.setRowData(0, response);
+							}
 
-					@Override
-					public void onFailure(Method method, Throwable exception) {
-						Logger logger = Logger.getLogger(MainPanel.class.getName());
-						logger.log(Level.SEVERE, "error" + exception.getMessage());
-					}
-				});
+							@Override
+							public void onFailure(Method method, Throwable exception) {
+								Logger logger = Logger.getLogger(MainPanel.class.getName());
+								logger.log(Level.SEVERE, "error " + exception.getMessage());
+							}
+						});
 			}
 		});
 		table.addColumn(delete);
@@ -87,7 +95,6 @@ public class MainPanel extends FlowPanel {
 
 			@Override
 			public void update(int index, Place object, String value) {
-				PlacesClient placesClient = GWT.create(PlacesClient.class);
 				final Place place = object;
 				placesClient.getPlaceDetails(place.getPlaceId(), new MethodCallback<PlaceDetails>() {
 
@@ -120,7 +127,6 @@ public class MainPanel extends FlowPanel {
 
 			@Override
 			public void update(int index, Place object, String value) {
-				PlacesClient placesClient = GWT.create(PlacesClient.class);
 				final Place place = object;
 				placesClient.getPlaceDetails(place.getPlaceId(), new MethodCallback<PlaceDetails>() {
 
@@ -149,15 +155,14 @@ public class MainPanel extends FlowPanel {
 
 	private void initComponents() {
 		FlowPanel flowPanel = new FlowPanel();
-		final TextBox searchField = new TextBox();
-		final CellTable<Place> placesTable = createTable();
+		searchField = new TextBox();
+		placesTable = createTable();
 
 		Button searchButton = new Button("Search");
 		searchButton.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				PlacesClient placesClient = GWT.create(PlacesClient.class);
 				placesClient.getPlaces(searchField.getText(), new MethodCallback<List<Place>>() {
 
 					@Override

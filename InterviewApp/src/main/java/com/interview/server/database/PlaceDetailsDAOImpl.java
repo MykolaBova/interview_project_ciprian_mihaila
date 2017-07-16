@@ -35,7 +35,9 @@ public class PlaceDetailsDAOImpl extends GenericCRUDManagerImpl<PlaceDetails, St
 	public void deletePlaceDetails(String placeId) {
 		entityManager.getTransaction().begin();
 		PlaceDetails placeDetails = read(placeId);
-		delete(placeDetails);
+		if (placeDetails != null) {
+			delete(placeDetails);
+		}
 		entityManager.getTransaction().commit();
 	}
 

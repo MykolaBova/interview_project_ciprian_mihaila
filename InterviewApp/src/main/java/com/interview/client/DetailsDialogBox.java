@@ -154,4 +154,5 @@ public class DetailsDialogBox extends DialogBox {
 		setGlassEnabled(true);
 		setAnimationEnabled(true);
 	}
+
 }
