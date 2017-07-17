@@ -11,6 +11,7 @@ import javax.ws.rs.PathParam;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
 
+import com.interview.shared.PhotoReference;
 import com.interview.shared.Place;
 import com.interview.shared.PlaceDetails;
 
@@ -36,4 +37,8 @@ public interface PlacesClient extends RestService {
 	@Path("/delete/{cityName}/{placeId}")
 	public void deletePlace(@PathParam("cityName") String cityName, @PathParam("placeId") String placeId,
 			MethodCallback<List<Place>> callback);
+
+	@GET
+	@Path("/photos/{placeId}")
+	public void getPhotos(@PathParam("placeId") String placeId, MethodCallback<List<PhotoReference>> callback);
 }

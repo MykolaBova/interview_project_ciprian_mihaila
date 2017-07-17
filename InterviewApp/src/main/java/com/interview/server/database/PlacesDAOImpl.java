@@ -29,15 +29,8 @@ public class PlacesDAOImpl extends GenericCRUDManagerImpl<Place, String> impleme
 
 	@Override
 	public List<Place> getPlaces(String cityName) {
-
-		// TypedQuery<Place>
-		// Query query = entityManager.createNativeQuery("SELECT p FROM Place p
-		// WHERE p.CITY_NAME = '" + cityName + "'",
-		// Place.class);
 		Query query = entityManager.createNativeQuery("SELECT * FROM Place WHERE CITY_NAME = '" + cityName + "'",
 				Place.class);
-
-		System.out.println(query.toString());
 
 		List<Place> resultList = query.getResultList();
 		return resultList;

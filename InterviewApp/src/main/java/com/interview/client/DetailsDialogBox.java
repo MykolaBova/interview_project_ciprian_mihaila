@@ -1,5 +1,6 @@
 package com.interview.client;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,9 +15,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.interview.shared.PhotoReference;
 import com.interview.shared.Place;
 import com.interview.shared.PlaceDetails;
 
@@ -33,6 +36,8 @@ public class DetailsDialogBox extends DialogBox {
 	private TextBox latlngTextBox;
 	private TextBox addressTextBox;
 	private TextBox phoneTextBox;
+
+	PlacesClient placesClient = GWT.create(PlacesClient.class);
 
 	private final DetailsDialogBox thisDialogBox = this;
 
@@ -69,9 +74,42 @@ public class DetailsDialogBox extends DialogBox {
 		dialogContents.add(createTextFieldEntry("LatLng: ", latlngTextBox));
 	}
 
-	private void addPlaceDetailsData(VerticalPanel dialogContents) {
+	private String createPhotoURL(String photoRef) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&");
+		sb.append("photoreference=");
+		sb.append(photoRef);
+		sb.append("&key=");
+		sb.append("AIzaSyAQhlhowY8CxaIZHA4JrTVnOLuO1FrduI0");
+		return sb.toString();
+
+	}
+
+	private void addPlaceDetailsData(final VerticalPanel dialogContents) {
 		dialogContents.add(createTextFieldEntry("Address: ", addressTextBox));
 		dialogContents.add(createTextFieldEntry("Phone: ", phoneTextBox));
+		if (!editable) {// add image
+			final Image image = new Image();
+			image.setPixelSize(200, 200);
+			dialogContents.add(image);
+			placesClient.getPhotos(placeDetails.getPlaceId(), new MethodCallback<List<PhotoReference>>() {
+
+				@Override
+				public void onSuccess(Method method, List<PhotoReference> response) {
+					if (response.size() > 0) {
+						// just first image for now
+						String photoRef = response.get(0).getPhotoReference();
+						image.setUrl(createPhotoURL(photoRef));
+					}
+				}
+
+				@Override
+				public void onFailure(Method method, Throwable exception) {
+					Logger logger = Logger.getLogger(MainPanel.class.getName());
+					logger.log(Level.SEVERE, "onFailure photos");
+				}
+			});
+		}
 	}
 
 	private void initTextBoxes() {
@@ -105,8 +143,6 @@ public class DetailsDialogBox extends DialogBox {
 			Button saveButton = new Button("Save", new ClickHandler() {
 				public void onClick(ClickEvent event) {
 					saveChanges();
-
-					PlacesClient placesClient = GWT.create(PlacesClient.class);
 					placesClient.savePlace(place, new MethodCallback<Place>() {
 
 						@Override

@@ -1,11 +1,17 @@
 package com.interview.shared;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "places_details")
@@ -24,6 +30,10 @@ public class PlaceDetails {
 	@Column(name = "ICON")
 	private String icon;
 
+	@OneToMany(mappedBy = "placeDetails", cascade = CascadeType.ALL)
+	@JsonManagedReference
+	private List<PhotoReference> photosReferences;
+
 	public PlaceDetails() {
 	}
 
@@ -33,6 +43,7 @@ public class PlaceDetails {
 		this.address = address;
 		this.phone = phone;
 		this.icon = icon;
+		this.setPhotosReferences(photosReferences);
 	}
 
 	public String getPlaceId() {
@@ -66,4 +77,13 @@ public class PlaceDetails {
 	public void setIcon(String icon) {
 		this.icon = icon;
 	}
+
+	public List<PhotoReference> getPhotosReferences() {
+		return photosReferences;
+	}
+
+	public void setPhotosReferences(List<PhotoReference> photosReferences) {
+		this.photosReferences = photosReferences;
+	}
+
 }

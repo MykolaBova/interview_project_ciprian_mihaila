@@ -10,9 +10,11 @@ import com.google.maps.PlaceDetailsRequest;
 import com.google.maps.TextSearchRequest;
 import com.google.maps.errors.ApiException;
 import com.google.maps.model.LatLng;
+import com.google.maps.model.Photo;
 import com.google.maps.model.PlaceDetails;
 import com.google.maps.model.PlacesSearchResponse;
 import com.google.maps.model.PlacesSearchResult;
+import com.interview.shared.PhotoReference;
 import com.interview.shared.Place;
 
 public class GooglePlacesService {
@@ -64,8 +66,22 @@ public class GooglePlacesService {
 		PlaceDetailsRequest placeDetailsRequest = new PlaceDetailsRequest(context);
 		placeDetailsRequest.placeId(placeId);
 		PlaceDetails result = placeDetailsRequest.await();
-		return new com.interview.shared.PlaceDetails(result.placeId, result.formattedAddress,
-				result.formattedPhoneNumber, result.icon.toString());
+
+		com.interview.shared.PlaceDetails placeDetailsDB = new com.interview.shared.PlaceDetails();
+		placeDetailsDB.setPlaceId(result.placeId);
+		placeDetailsDB.setAddress(result.formattedAddress);
+		placeDetailsDB.setPhone(result.formattedPhoneNumber);
+		placeDetailsDB.setIcon(result.icon.toString());
+
+		if (result.photos != null) {
+			List<PhotoReference> photoRefs = new ArrayList<>();
+			for (Photo photo : result.photos) {
+				photoRefs.add(new PhotoReference(photo.photoReference, placeDetailsDB));
+			}
+			placeDetailsDB.setPhotosReferences(photoRefs);
+		}
+
+		return placeDetailsDB;
 	}
 
 	public List<Place> getPlaces(String cityName) {
