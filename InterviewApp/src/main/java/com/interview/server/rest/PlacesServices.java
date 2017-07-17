@@ -49,13 +49,24 @@ public class PlacesServices {
 		} else {
 			List<Place> localPlaces = placesDAO.getPlaces(cityName);
 			List<Place> placesToUpdate = new ArrayList<>();
+			List<Place> newPlaces = new ArrayList<>();
 			for (Place gPlace : googleServicePlaces) {
+				boolean saved = false;
 				for (Place lPlace : localPlaces) {
-					if (lPlace.getPlaceId().equals(gPlace.getPlaceId()) && !lPlace.isDirtyFlag()) {
-						placesToUpdate.add(gPlace);
+					if (lPlace.getPlaceId().equals(gPlace.getPlaceId())) {
+						saved = true;
+						if (!lPlace.isDirtyFlag()) {
+							placesToUpdate.add(gPlace);
+						}
 					}
 				}
+				if (!saved) {
+					gPlace.setCity(city);
+					gPlace.setDirtyFlag(false);
+					newPlaces.add(gPlace);
+				}
 			}
+			placesDAO.savePlaces(newPlaces);
 			placesDAO.updatePlaces(placesToUpdate);
 		}
 

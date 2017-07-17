@@ -9,6 +9,7 @@ import org.fusesource.restygwt.client.MethodCallback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -25,6 +26,9 @@ public class DetailsDialogBox extends DialogBox {
 	private PlaceDetails placeDetails;
 	private boolean editable;
 
+	private CellTable<Place> placesTable;
+	private int rowIndex;
+
 	private TextBox nameTextBox;
 	private TextBox latlngTextBox;
 	private TextBox addressTextBox;
@@ -36,8 +40,19 @@ public class DetailsDialogBox extends DialogBox {
 		this.place = place;
 		this.placeDetails = details;
 		this.editable = editable;
+	}
+
+	public DetailsDialogBox(Place place, PlaceDetails details, boolean editable, CellTable<Place> table, int row) {
+		this(place, details, editable);
+		this.placesTable = table;
+		this.rowIndex = row;
+	}
+
+	@Override
+	public void show() {
 		initTextBoxes();
 		initComponents();
+		super.show();
 	}
 
 	private HorizontalPanel createTextFieldEntry(String name, TextBox textBox) {
@@ -98,6 +113,7 @@ public class DetailsDialogBox extends DialogBox {
 						public void onSuccess(Method method, Place response) {
 							Logger logger = Logger.getLogger(MainPanel.class.getName());
 							logger.log(Level.SEVERE, "success");
+							placesTable.redrawRow(rowIndex);
 						}
 
 						@Override

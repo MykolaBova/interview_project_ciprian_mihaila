@@ -45,8 +45,7 @@ public class MainPanel extends VerticalPanel {
 		initComponents();
 	}
 
-	private CellTable<Place> createTable() {
-		CellTable<Place> table = new CellTable<Place>();
+	private void addTableColumns(CellTable<Place> table) {
 		TextColumn<Place> nameColumn = new TextColumn<Place>() {
 			@Override
 			public String getValue(Place object) {
@@ -62,7 +61,9 @@ public class MainPanel extends VerticalPanel {
 			}
 		};
 		table.addColumn(locationColumn, "Location");
+	}
 
+	private Column<Place, String> createDeleteColumn() {
 		ButtonCell deleteButton = new ButtonCell();
 		Column<Place, String> delete = new Column<Place, String>(deleteButton) {
 			@Override
@@ -94,8 +95,11 @@ public class MainPanel extends VerticalPanel {
 						});
 			}
 		});
-		table.addColumn(delete);
 
+		return delete;
+	}
+
+	private Column<Place, String> createViewColumn() {
 		ButtonCell viewButton = new ButtonCell();
 		Column<Place, String> view = new Column<Place, String>(viewButton) {
 			@Override
@@ -106,13 +110,12 @@ public class MainPanel extends VerticalPanel {
 		view.setFieldUpdater(new FieldUpdater<Place, String>() {
 
 			@Override
-			public void update(int index, Place object, String value) {
-				final Place place = object;
-				placesClient.getPlaceDetails(place.getPlaceId(), new MethodCallback<PlaceDetails>() {
+			public void update(int index, final Place object, String value) {
+				placesClient.getPlaceDetails(object.getPlaceId(), new MethodCallback<PlaceDetails>() {
 
 					@Override
 					public void onSuccess(Method method, PlaceDetails response) {
-						final DialogBox dialogBox = new DetailsDialogBox(place, response, false);
+						final DialogBox dialogBox = new DetailsDialogBox(object, response, false);
 						dialogBox.center();
 						dialogBox.show();
 					}
@@ -126,8 +129,10 @@ public class MainPanel extends VerticalPanel {
 
 			}
 		});
-		table.addColumn(view);
+		return view;
+	}
 
+	private Column<Place, String> createEditColumn() {
 		ButtonCell editButton = new ButtonCell();
 		Column<Place, String> edit = new Column<Place, String>(editButton) {
 			@Override
@@ -138,15 +143,15 @@ public class MainPanel extends VerticalPanel {
 		edit.setFieldUpdater(new FieldUpdater<Place, String>() {
 
 			@Override
-			public void update(int index, Place object, String value) {
-				final Place place = object;
-				placesClient.getPlaceDetails(place.getPlaceId(), new MethodCallback<PlaceDetails>() {
+			public void update(final int index, final Place object, String value) {
+				placesClient.getPlaceDetails(object.getPlaceId(), new MethodCallback<PlaceDetails>() {
 
 					@Override
 					public void onSuccess(Method method, PlaceDetails response) {
-						final DialogBox dialogBox = new DetailsDialogBox(place, response, true);
+						final DialogBox dialogBox = new DetailsDialogBox(object, response, true, placesTable, index);
 						dialogBox.center();
 						dialogBox.show();
+						placesTable.redrawRow(index);
 					}
 
 					@Override
@@ -158,7 +163,17 @@ public class MainPanel extends VerticalPanel {
 
 			}
 		});
-		table.addColumn(edit);
+		return edit;
+	}
+
+	private CellTable<Place> createTable() {
+		CellTable<Place> table = new CellTable<Place>();
+
+		addTableColumns(table);
+
+		table.addColumn(createDeleteColumn());
+		table.addColumn(createViewColumn());
+		table.addColumn(createEditColumn());
 
 		table.setVisible(false);
 

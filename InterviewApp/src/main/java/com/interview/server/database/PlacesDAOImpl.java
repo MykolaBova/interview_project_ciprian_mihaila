@@ -49,10 +49,12 @@ public class PlacesDAOImpl extends GenericCRUDManagerImpl<Place, String> impleme
 		transaction.begin();
 		for (Place place : places) {
 			Place p = read(place.getPlaceId());
-			p.setName(place.getName());
-			p.setDirtyFlag(place.isDirtyFlag());
-			p.setLocation(place.getLocation());
-			p.setPlaceDetails(place.getPlaceDetails());
+			if (p != null) {
+				p.setName(place.getName());
+				p.setDirtyFlag(place.isDirtyFlag());
+				p.setLocation(place.getLocation());
+				p.setPlaceDetails(place.getPlaceDetails());
+			}
 		}
 		transaction.commit();
 	}
